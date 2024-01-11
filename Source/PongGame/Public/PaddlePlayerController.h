@@ -19,17 +19,13 @@ class PONGGAME_API APaddlePlayerController : public APlayerController
 public:
 	APaddlePlayerController();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> ScoreWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> WaitWidgetClass;
-
-	UUserWidget* ScoreWidgetInstance;
-	UUserWidget* WaitWidgetInstance;
-
 	UFUNCTION(Client, Reliable)
 	void CreateScoreWidget();
+
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateLocation(FVector NewLocation);
+
+	void MoveHorizontal(float AxisValue);
 
 	virtual void BeginPlay() override;
 
@@ -37,10 +33,11 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(Server, Reliable)
-	void Server_UpdateLocation(FVector NewLocation);
+private:
+	TSubclassOf<UUserWidget> ScoreWidgetClass;
+	TSubclassOf<UUserWidget> WaitWidgetClass;
 
-	UFUNCTION(BlueprintCallable)
-	void MoveHorizontal(float AxisValue);
+	UUserWidget* ScoreWidgetInstance;
+	UUserWidget* WaitWidgetInstance;
 	
 };

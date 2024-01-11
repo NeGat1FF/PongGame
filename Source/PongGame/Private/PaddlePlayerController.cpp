@@ -22,7 +22,7 @@ APaddlePlayerController::APaddlePlayerController()
 
 void APaddlePlayerController::CreateScoreWidget_Implementation()
 {
-    if(WaitWidgetInstance)
+    if (WaitWidgetInstance)
     {
         WaitWidgetInstance->RemoveFromParent();
     }
@@ -34,7 +34,7 @@ void APaddlePlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    if(IsLocalPlayerController() && !ScoreWidgetInstance)
+    if (IsLocalPlayerController() && !ScoreWidgetInstance)
     {
         WaitWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WaitWidgetClass);
         WaitWidgetInstance->AddToViewport();
@@ -48,30 +48,23 @@ void APaddlePlayerController::SetupInputComponent()
     InputComponent->BindAxis("MoveHorizontal", this, &APaddlePlayerController::MoveHorizontal);
 }
 
-
 // Looks like updating location in Tick works better than in MoveHorizontal, but I'm not sure
 void APaddlePlayerController::Tick(float DeltaTime)
 {
-    if(!HasAuthority())
+    APawn *MyPawn = GetPawn();
+    if (MyPawn)
     {
-        APawn* MyPawn = GetPawn();
-        if(MyPawn)
-        {
-            FVector NewLocation = MyPawn->GetActorLocation();
-            Server_UpdateLocation(NewLocation);
-        }
+        FVector NewLocation = MyPawn->GetActorLocation();
+        Server_UpdateLocation(NewLocation);
     }
 }
 
 void APaddlePlayerController::MoveHorizontal(float AxisValue)
 {
-    if (!HasAuthority()) // Only execute on the client
+    if (AxisValue != 0)
     {
-        if (AxisValue != 0)
-        {
-            GetPawn()->AddMovementInput(FVector(0.0f, AxisValue, 0.0f) * GetPawn()->GetRootComponent()->GetForwardVector().X);
-            //Server_UpdateLocation(GetPawn()->GetActorLocation());
-        }
+        GetPawn()->AddMovementInput(FVector(0.0f, AxisValue, 0.0f) * GetPawn()->GetRootComponent()->GetForwardVector().X);
+        // Server_UpdateLocation(GetPawn()->GetActorLocation());
     }
 }
 
